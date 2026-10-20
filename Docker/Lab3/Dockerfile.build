@@ -1,0 +1,21 @@
+
+FROM maven:3.9-eclipse-temurin-17
+
+WORKDIR /app
+
+RUN useradd --create-home --uid 10001 appuser \
+    && mkdir -p /home/appuser/.m2 \
+    && chown -R appuser:appuser /app /home/appuser
+
+ENV MAVEN_CONFIG=/home/appuser/.m2
+
+COPY --chown=appuser:appuser CalculatorMavenApp/pom.xml ./pom.xml
+COPY --chown=appuser:appuser CalculatorMavenApp/src ./src
+
+USER appuser
+
+RUN mvn package
+
+EXPOSE 8080
+
+CMD ["java", "-jar", "target/calculator.jar"]

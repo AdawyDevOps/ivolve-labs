@@ -1,0 +1,14 @@
+FROM eclipse-temurin:17-jre
+
+WORKDIR /app
+
+RUN useradd --create-home --uid 10001 appuser \
+    && chown appuser:appuser /app
+
+COPY --chown=appuser:appuser CalculatorMavenApp/target/calculator.jar ./calculator.jar
+
+USER appuser
+
+EXPOSE 8080
+
+CMD ["java", "-jar", "calculator.jar"]
