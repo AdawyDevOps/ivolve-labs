@@ -121,14 +121,17 @@ Both Dockerfiles run the application as a non-root user named `appuser`, followi
 
 ## Screenshots
 
-Screenshots documenting the build, execution, tests, and image-size comparison are stored in the `screenshots/` directory.
+### 1. Build and Run — Maven Image
 
-- `01-app1-build.png` — Build the Maven-based image.
-- `02-container1-test.png` — Run and test the first container.
-- `03-app1-size.png` — Inspect the first image size.
-- `04-local-maven-build.png` — Build the application locally using Maven.
-- `05-app2-build-and-size.png` — Build and inspect the runtime image.
-- `06-container2-test.png` — Run and test the second container.
+![Build, run, and image size of app1](screenshots/01-app1-build-run-size.png)
+
+This screenshot shows the Maven-based Docker image build, calculator execution, and image size.
+
+### 2. Build and Run — JRE Runtime Image
+
+![Build, run, and image size of app2](screenshots/02-app2-build-run-size.png)
+
+This screenshot shows the Java runtime image build, calculator execution, and image size comparison.
 
 ## Key Takeaways
 
