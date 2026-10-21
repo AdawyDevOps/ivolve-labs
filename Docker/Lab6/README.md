@@ -56,7 +56,7 @@ Verify the image:
 docker images ivolve1
 ```
 
-![Docker image build and size](../screenshots/01-image-build-and-size.png)
+![Docker image build and size](./screenshots/01-image-build-and-size.png)
 
 ## Step 2: Run a Container with Environment Variables and Resource Limits
 
@@ -98,7 +98,7 @@ APP_NAME=iVolveApp1
 APP_ENV=stg
 ```
 
-![Container 1 running with environment variables](../screenshots/02-container1-running-and-env.png)
+![Container 1 running with environment variables](./screenshots/02-container1-running-and-env.png)
 
 ## Step 3: Monitor Container Resources
 
@@ -127,7 +127,7 @@ docker rmi ivolve1
 
 The `env.txt` file contains:
 
-![Creating the environment variable file](../screenshots/03-create-env-file.png)
+![Creating the environment variable file](./screenshots/03-create-env-file.png)
 
 ```text
 APP_NAME=iVolveApp2
@@ -176,7 +176,7 @@ docker rm -f container2
 docker rmi ivolve1
 ```
 
-![Container 2 running with the environment file](../screenshots/04-container2-env-file.png)
+![Container 2 running with the environment file](./screenshots/04-container2-env-file.png)
 
 ## Step 5: Define Environment Variables in the Dockerfile
 
@@ -199,9 +199,9 @@ Verify the image:
 docker images ivolve3
 ```
 
-![Environment variables defined in the Dockerfile](../screenshots/05-hardcoded-env-dockerfile.png)
+![Environment variables defined in the Dockerfile](./screenshots/05-hardcoded-env-dockerfile.png)
 
-![Building the image from the alternate Dockerfile](../screenshots/06-build-hardcoded-image.png)
+![Building the image from the alternate Dockerfile](./screenshots/06-build-hardcoded-image.png)
 
 ## Step 6: Run a Container Using Dockerfile Environment Variables
 
@@ -233,7 +233,7 @@ APP_NAME=iVolveApp3
 APP_ENV=dev
 ```
 
-![Running the container and testing the application](../screenshots/07-run-container-and-curl.png)
+![Running the container and testing the application](./screenshots/07-run-container-and-curl.png)
 
 ## Step 7: Cleanup
 
