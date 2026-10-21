@@ -2,84 +2,65 @@
 
 ## Overview
 
-This lab demonstrates how to configure Docker containers using environment variables and manage container resource limits.
+This lab demonstrates how to configure Docker environment variables using three methods:
 
-The lab covers three methods of configuring environment variables:
-- Passing variables directly using the `-e` option.
-- Loading variables from an environment file using `--env-file`.
-- Defining default environment variables in a Dockerfile using `ENV`.
+- Passing environment variables directly using `-e`.
+- Loading environment variables from a file using `--env-file`.
+- Defining environment variables in a Dockerfile using `ENV`.
 
-It also covers building Docker images, running containers, verifying configurations, and inspecting resource usage.
-
-## Objectives
-
-- Build and inspect Docker images.
-- Run containers with custom names and port mappings.
-- Configure runtime environment variables.
-- Load configuration from an environment file.
-- Define default environment variables in a Dockerfile.
-- Apply CPU and memory limits.
-- Verify container configuration and application availability.
+It also covers container resource limits and resource monitoring.
 
 ## Project Structure
 
 ```text
-ivolve-labs/
-└── Docker/
-    └── Lab6/
-        ├── README.md
-        ├── PythonApp/
-        │   ├── Dockerfile
-        │   ├── Dockerfile.hardcoded
-        │   ├── app.py
-        │   ├── env.txt
-        │   └── requirements.txt
-        └── screenshots/
-            ├── 01-image-build-and-size.png
-            ├── 02-container1-running-and-env.png
-            ├── 03-create-env-file.png
-            ├── 04-container2-env-file.png
-            ├── 05-hardcoded-env-dockerfile.png
-            ├── 06-build-hardcoded-image.png
-            └── 07-run-container-and-curl.png
+Docker/Lab6/
+├── PythonApp/
+│   ├── Dockerfile
+│   ├── Dockerfile.hardcoded
+│   ├── app.py
+│   ├── env.txt
+│   └── requirements.txt
+├── screenshots/
+│   ├── 01-image-build-and-size.png
+│   ├── 02-container1-running-and-env.png
+│   ├── 03-create-env-file.png
+│   ├── 04-container2-env-file.png
+│   ├── 05-hardcoded-env-dockerfile.png
+│   ├── 06-build-hardcoded-image.png
+│   └── 07-run-container-and-curl.png
+└── README.md
 ```
+
 ## Prerequisites
 
 - Docker installed and running.
-- A terminal with access to the project directory.
-
-Run the Docker commands in this lab from the `PythonApp` directory:
-
-```bash
-cd ~/ivolve-labs/Docker/Lab6/PythonApp
+- Basic knowledge of Docker images and containers.
 
 ## Step 1: Build the Docker Image
 
-Build the application image:
+Navigate to the application directory:
+
+```bash
+cd ~/ivolve-labs/Docker/Lab6/PythonApp
+```
+
+Build the Docker image:
 
 ```bash
 docker build -t ivolve1 .
 ```
 
-Inspect the available images:
+Verify the image:
 
 ```bash
-docker images
-docker image inspect ivolve1
+docker images ivolve1
 ```
 
-**Explanation:**
-- `docker build` builds an image from a Dockerfile.
-- `-t ivolve1` assigns a name to the image.
-- `.` specifies the current directory as the build context.
-- `docker images` lists local images.
-- `docker image inspect` displays detailed image metadata.
+![Docker image build and size](../screenshots/01-image-build-and-size.png)
 
-![Docker image build and size](screenshots/01-image-build-and-size.png)
+## Step 2: Run a Container with Environment Variables and Resource Limits
 
-## Step 2: Run Container 1 with Environment Variables and Resource Limits
-
-Run the container with custom environment variables and resource limits:
+Run the container with environment variables passed directly using `-e`, while limiting CPU and memory resources:
 
 ```bash
 docker run -d \
@@ -92,26 +73,23 @@ docker run -d \
   ivolve1
 ```
 
-Verify that the container is running:
+Check the container status:
 
 ```bash
 docker ps
 ```
 
-Inspect the application environment variables:
+Verify the application:
+
+```bash
+curl http://localhost:5000
+```
+
+Verify the environment variables inside the container:
 
 ```bash
 docker exec container1 printenv | grep '^APP_'
 ```
-
-**Explanation:**
-- `-d` runs the container in the background.
-- `--name` assigns a container name.
-- `-p 5000:5000` maps host port 5000 to container port 5000.
-- `-e` defines an environment variable at runtime.
-- `--cpus=1` limits CPU usage to one CPU's worth of processing time.
-- `--memory=256m` sets a memory limit of 256 MiB.
-- `docker exec` runs a command inside a running container.
 
 Expected environment variables:
 
@@ -120,40 +98,49 @@ APP_NAME=iVolveApp1
 APP_ENV=stg
 ```
 
-![Container 1 running with environment variables](screenshots/02-container1-running-and-env.png)
+![Container 1 running with environment variables](../screenshots/02-container1-running-and-env.png)
 
-## Step 3: Create an Environment File
+## Step 3: Monitor Container Resources
 
-Create an environment file containing the application's configuration:
-
-```bash
-cat > env.txt <<'ENV_EOF'
-APP_NAME=iVolveApp2
-APP_ENV=prod
-ENV_EOF
-```
-
-Display its contents:
+Monitor CPU and memory usage while `container1` is running:
 
 ```bash
-cat env.txt
+docker stats container1 --no-stream
 ```
 
-**Explanation:**
+Inspect the container configuration:
 
-An environment file stores configuration as `KEY=VALUE` pairs. It separates configuration from the image and avoids specifying multiple `-e` options individually.
+```bash
+docker inspect container1
+```
 
-![Creating the environment variable file](screenshots/03-create-env-file.png)
+The container is configured with a CPU limit of 1 CPU and a memory limit of 256 MB.
 
-## Step 4: Run Container 2 Using the Environment File
-
-Remove Container 1 if it is still running, releasing host port 5000:
+After completing the first experiment, remove the container and its image:
 
 ```bash
 docker rm -f container1
+docker rmi ivolve1
 ```
 
-Start Container 2 using the environment file:
+## Step 4: Configure Environment Variables Using an Environment File
+
+The `env.txt` file contains:
+
+![Creating the environment variable file](../screenshots/03-create-env-file.png)
+
+```text
+APP_NAME=iVolveApp2
+APP_ENV=prod
+```
+
+Build the image again if it was removed in the previous step:
+
+```bash
+docker build -t ivolve1 .
+```
+
+Run a new container using `--env-file`:
 
 ```bash
 docker run -d \
@@ -163,17 +150,17 @@ docker run -d \
   ivolve1
 ```
 
-Verify the container and its environment variables:
+Verify the application response:
 
 ```bash
-docker ps
-docker exec container2 printenv | grep '^APP_'
+curl http://localhost:5000
 ```
 
-**Explanation:**
-- `--env-file env.txt` loads variables from the specified file.
-- The same image can be reused with different configuration without rebuilding it.
-- `docker rm -f` forcefully removes the specified container.
+Verify the environment variables:
+
+```bash
+docker exec container2 printenv | grep '^APP_'
+```
 
 Expected environment variables:
 
@@ -182,87 +169,62 @@ APP_NAME=iVolveApp2
 APP_ENV=prod
 ```
 
-![Container 2 running with the environment file](screenshots/04-container2-env-file.png)
+After completing the second experiment, remove the container and image:
 
-## Step 5: Define Environment Variables in a Dockerfile
+```bash
+docker rm -f container2
+docker rmi ivolve1
+```
 
-The `Dockerfile.hardcoded` file defines default environment variables using `ENV` instructions.
+![Container 2 running with the environment file](../screenshots/04-container2-env-file.png)
 
-Add these lines before the `CMD` instruction:
+## Step 5: Define Environment Variables in the Dockerfile
+
+The `Dockerfile.hardcoded` file defines the following environment variables:
 
 ```dockerfile
 ENV APP_NAME=iVolveApp3
 ENV APP_ENV=dev
 ```
 
-Inspect the complete file:
-
-```bash
-cat Dockerfile.hardcoded
-```
-
-**Explanation:**
-- `ENV` defines default environment variables in the image.
-- Containers created from this image inherit these default values.
-- Runtime environment variables can override image defaults.
-- A separate Dockerfile preserves the original Dockerfile.
-
-![Environment variables defined in the Dockerfile](screenshots/05-hardcoded-env-dockerfile.png)
-
-## Step 6: Build the New Image
-
-Build an image using the modified Dockerfile:
+Build a new image using the alternate Dockerfile:
 
 ```bash
 docker build -t ivolve3 -f Dockerfile.hardcoded .
 ```
 
-Inspect the generated image:
+Verify the image:
 
 ```bash
-docker images
-docker image inspect ivolve3
+docker images ivolve3
 ```
 
-**Explanation:**
-- `-t ivolve3` assigns a distinct name to the new image.
-- `-f Dockerfile.hardcoded` specifies the Dockerfile to use.
-- The new image contains the default environment variables defined in that file.
+![Environment variables defined in the Dockerfile](../screenshots/05-hardcoded-env-dockerfile.png)
 
-![Building the image from the modified Dockerfile](screenshots/06-build-hardcoded-image.png)
+![Building the image from the alternate Dockerfile](../screenshots/06-build-hardcoded-image.png)
 
-## Step 7: Run the New Image and Test the Application
+## Step 6: Run a Container Using Dockerfile Environment Variables
 
-Remove the previous Container 2 if it still exists:
-
-```bash
-docker rm -f container2
-```
-
-Run a container using the new image:
+Run the container:
 
 ```bash
 docker run -d \
-  --name container2 \
+  --name container3 \
   -p 5000:5000 \
   ivolve3
 ```
 
-Verify its environment variables:
-
-```bash
-docker exec container2 printenv | grep '^APP_'
-```
-
-Test the application:
+Verify the application response:
 
 ```bash
 curl http://localhost:5000
 ```
 
-**Explanation:**
+Verify the environment variables:
 
-The container inherits the default environment variables from `Dockerfile.hardcoded`. The `curl` command sends an HTTP request to the application through host port 5000.
+```bash
+docker exec container3 printenv | grep '^APP_'
+```
 
 Expected environment variables:
 
@@ -271,59 +233,39 @@ APP_NAME=iVolveApp3
 APP_ENV=dev
 ```
 
-The HTTP response depends on the application's implementation.
+![Running the container and testing the application](../screenshots/07-run-container-and-curl.png)
 
-![Running the container and testing the application](screenshots/07-run-container-and-curl.png)
+## Step 7: Cleanup
 
-## Resource Monitoring
-
-Monitor a running container:
+After completing the final experiment, remove the container and images:
 
 ```bash
-docker stats container2 --no-stream
+docker rm -f container3
+docker rmi ivolve3
 ```
 
-Inspect the container configuration:
-
-```bash
-docker inspect container2
-```
-
-**Important:** The CPU and memory limits specified in Step 2 apply to `container1`. Containers started in later steps do not inherit those container-specific limits automatically.
-
-To verify the resource limits from Step 2, run `docker stats container1 --no-stream` while Container 1 is still running.
-
-## Key Takeaways
-
-- Docker images can be reused with different runtime configurations.
-- The `-e` option passes individual environment variables to a container.
-- The `--env-file` option loads multiple variables from a file.
-- Dockerfile `ENV` instructions define image-level defaults.
-- Runtime environment variables can override image defaults.
-- CPU and memory limits help control container resource consumption.
-- `docker exec`, `docker inspect`, `docker stats`, and `curl` help verify configuration, resource usage, and application availability.
-
-## Cleanup
-
-Remove the test container:
-
-```bash
-docker rm -f container2
-```
-
-Verify that the container has been removed:
+Confirm that the test containers have been removed:
 
 ```bash
 docker ps -a
 ```
 
----
+## Important Notes
 
-## Conclusion
+- Environment variables passed using `-e` or `--env-file` configure the container at runtime.
+- Environment variables defined with `ENV` provide default values in the image.
+- Runtime environment variables can override values defined in the Dockerfile.
+- CPU and memory limits apply only to the container on which they are configured.
+- Resource monitoring must be performed before removing the relevant container.
 
-This lab demonstrated how to build Docker images, configure containers using environment variables, apply resource limits, and verify application behavior.
+## Key Takeaways
 
-It also highlighted the importance of separating application configuration from Docker images and validating container settings using Docker inspection and monitoring commands.
+- The `-e` option passes environment variables at runtime.
+- The `--env-file` option loads multiple environment variables from a file.
+- Dockerfile `ENV` instructions define default environment variables in an image.
+- Runtime environment variables can override image defaults.
+- CPU and memory limits control container resource consumption.
+- `docker exec`, `docker inspect`, `docker stats`, and `curl` help verify container configuration and application behavior.
 
 ## Author
 
