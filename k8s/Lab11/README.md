@@ -27,11 +27,10 @@ All resources are created **declaratively** with YAML manifests and `kubectl app
 Lab11/
 ├── README.md
 ├── manifests/
-│   ├── 01-namespace.yaml
-│   ├── 02-resourcequota.yaml
-│   ├── 03-deployment.yaml
-│   └── tests/
-│       └── 04-extra-pod.yaml
+│   ├── namespace.yaml
+│   ├── resourcequota.yaml
+│   ├── deployment.yaml
+│   └── extra-pod.yaml
 └── screenshots/
     ├── 01-namespace.png
     ├── 02-quota-created.png
@@ -39,8 +38,6 @@ Lab11/
     ├── 04-extra-pod-quota-exceeded.png
     └── 05-deployment-scale-fail.png
 ```
-
-`kubectl apply -f manifests/` does not descend into subfolders, so the files under `tests/` are applied only on purpose.
 
 ## Resource Name Note
 
@@ -50,7 +47,7 @@ The lab asks for a quota named `ivolveQuota`. Kubernetes resource names must be 
 
 ### 1. Create the namespace
 
-`manifests/01-namespace.yaml`:
+`manifests/namespace.yaml`:
 
 ```yaml
 apiVersion: v1
@@ -60,14 +57,14 @@ metadata:
 ```
 
 ```bash
-kubectl apply -f manifests/01-namespace.yaml
+kubectl apply -f manifests/namespace.yaml
 ```
 
 ![Namespace](screenshots/01-namespace.png)
 
 ### 2. Create the ResourceQuota
 
-`manifests/02-resourcequota.yaml`:
+`manifests/resourcequota.yaml`:
 
 ```yaml
 apiVersion: v1
@@ -81,7 +78,7 @@ spec:
 ```
 
 ```bash
-kubectl apply -f manifests/02-resourcequota.yaml
+kubectl apply -f manifests/resourcequota.yaml
 ```
 
 Verify the quota (nothing is used yet, so `Used` is 0 and `Hard` is 3):
@@ -95,7 +92,7 @@ kubectl describe resourcequota ivolve-quota -n ivolve
 
 ### 3. Fill the quota with a Deployment
 
-`manifests/03-deployment.yaml` runs 3 replicas, which uses the whole pod quota:
+`manifests/deployment.yaml` runs 3 replicas, which uses the whole pod quota:
 
 ```yaml
 apiVersion: apps/v1
@@ -119,7 +116,7 @@ spec:
 ```
 
 ```bash
-kubectl apply -f manifests/03-deployment.yaml
+kubectl apply -f manifests/deployment.yaml
 kubectl rollout status deployment/web -n ivolve
 kubectl get pods -n ivolve -o wide
 kubectl describe resourcequota ivolve-quota -n ivolve
@@ -131,7 +128,7 @@ Three pods are Running and the quota shows `pods 3 / 3`.
 
 ## Verification: the quota blocks the 4th pod
 
-`manifests/tests/04-extra-pod.yaml`:
+`manifests/extra-pod.yaml`:
 
 ```yaml
 apiVersion: v1
@@ -148,7 +145,7 @@ spec:
 Applied only after the Deployment finished rolling out, so the quota is already full:
 
 ```bash
-kubectl apply -f manifests/tests/04-extra-pod.yaml
+kubectl apply -f manifests/extra-pod.yaml
 kubectl get pods -n ivolve
 ```
 
@@ -164,21 +161,21 @@ The pod is not created, and the original 3 pods are untouched.
 
 ### Same limit through a controller
 
-Changing `replicas: 3` to `replicas: 4` in `03-deployment.yaml` and re-applying it shows the same enforcement through a controller:
+Changing `replicas: 3` to `replicas: 4` in `deployment.yaml` and re-applying it shows the same enforcement through a controller:
 
 ```bash
-kubectl apply -f manifests/03-deployment.yaml
+kubectl apply -f manifests/deployment.yaml
 kubectl get deployment web -n ivolve
 kubectl get events -n ivolve --field-selector reason=FailedCreate
 ```
 
-The Deployment stays at `3/4` ready. The ReplicaSet controller keeps trying to create the 4th pod and fails with `FailedCreate` events that mention the exceeded quota. The rejection happens at pod creation time, and the Deployment itself is accepted.
+The Deployment stays at `3/4` ready. The ReplicaSet controller keeps trying to create the 4th pod and fails with `FailedCreate` events that mention the exceeded quota. The rejection happens at pod creation time, and the Deployment itself is accepted. The file was set back to `replicas: 3` afterwards.
 
 ![Scale fail](screenshots/05-deployment-scale-fail.png)
 
 ## Notes
 
-- Quota enforcement is first come, first served. Whichever create request arrives after the limit is reached is the one rejected. That is why the extra pod is applied only after the rollout completes. Applying everything at once could let `extra-pod` win the race and make one of the Deployment pods fail instead.
+- Quota enforcement is first come, first served. Whichever create request arrives after the limit is reached is the one rejected. That is why the manifests are applied one file at a time and `extra-pod.yaml` only after the rollout completes. Running `kubectl apply -f manifests/` on the whole folder would also apply `extra-pod.yaml`, and it could win the race and make one of the Deployment pods fail instead.
 - The ResourceQuota here only counts pods. If it also limited CPU or memory, every pod in the namespace would need to declare resource requests/limits, otherwise it would be rejected.
 - The quota applies per namespace. Other namespaces are not affected.
 - Declarative workflow: the YAML files are the source of truth. Change the file and re-apply it instead of using `kubectl scale`, so the cluster and the repository stay in sync.
@@ -186,9 +183,9 @@ The Deployment stays at `3/4` ready. The ReplicaSet controller keeps trying to c
 ## Cleanup (optional)
 
 ```bash
-kubectl delete -f manifests/03-deployment.yaml
-kubectl delete -f manifests/02-resourcequota.yaml
-kubectl delete -f manifests/01-namespace.yaml
+kubectl delete -f manifests/deployment.yaml
+kubectl delete -f manifests/resourcequota.yaml
+kubectl delete -f manifests/namespace.yaml
 ```
 
 Deleting the namespace also removes everything inside it. Lab 12 also uses the `ivolve` namespace, so keep it if you continue with that lab.
