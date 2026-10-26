@@ -1,0 +1,24 @@
+---
+- name: Apply the Calico CRDs and the Tigera operator
+  ansible.builtin.command: "kubectl apply --server-side --force-conflicts -f https://raw.githubusercontent.com/projectcalico/calico/{{ calico_version }}/manifests/{{ item }}"
+  environment:
+    KUBECONFIG: /etc/kubernetes/admin.conf
+  loop:
+    - v1_crd_projectcalico_org.yaml
+    - operator-crds.yaml
+    - tigera-operator.yaml
+
+- name: Render the Calico installation resource
+  ansible.builtin.template:
+    src: calico-installation.yaml.j2
+    dest: /root/calico-installation.yaml
+    mode: "0600"
+
+- name: Apply the Calico installation resource
+  ansible.builtin.command: kubectl apply -f /root/calico-installation.yaml
+  environment:
+    KUBECONFIG: /etc/kubernetes/admin.conf
+  register: calico_apply
+  retries: 10
+  delay: 10
+  until: calico_apply.rc == 0

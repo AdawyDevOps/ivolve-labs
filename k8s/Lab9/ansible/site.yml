@@ -1,0 +1,52 @@
+---
+- name: 1. Prepare all nodes (swap, kernel, containerd, kubeadm packages)
+  hosts: all
+  tags: [prepare]
+  roles:
+    - common
+
+- name: 2. Initialize the first control plane node
+  hosts: masters[0]
+  tags: [init]
+  roles:
+    - control_plane_init
+
+- name: 3. Install Calico CNI
+  hosts: masters[0]
+  tags: [cni]
+  roles:
+    - cni
+
+- name: 4. Join the other control plane nodes (one at a time)
+  hosts: masters[1:]
+  serial: 1
+  tags: [join-masters]
+  roles:
+    - control_plane_join
+
+- name: 5. Join the worker nodes
+  hosts: workers
+  tags: [join-workers]
+  roles:
+    - worker_join
+
+- name: 6. Wait for the cluster and show the result
+  hosts: masters[0]
+  tags: [verify]
+  tasks:
+    - name: Wait until every node is Ready
+      ansible.builtin.command: kubectl wait --for=condition=Ready nodes --all --timeout=600s
+      environment:
+        KUBECONFIG: /etc/kubernetes/admin.conf
+      changed_when: false
+
+    - name: Get nodes
+      ansible.builtin.command: kubectl get nodes -o wide
+      environment:
+        KUBECONFIG: /etc/kubernetes/admin.conf
+      register: nodes_out
+      changed_when: false
+
+    - name: Show nodes
+      ansible.builtin.debug:
+        msg: "{{ nodes_out.stdout_lines }}"

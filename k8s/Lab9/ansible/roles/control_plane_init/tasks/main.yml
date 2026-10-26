@@ -1,0 +1,46 @@
+---
+- name: Check whether the cluster is already initialized
+  ansible.builtin.stat:
+    path: /etc/kubernetes/admin.conf
+  register: admin_conf
+
+- name: Render the kubeadm config
+  ansible.builtin.template:
+    src: kubeadm-config.yaml.j2
+    dest: /root/kubeadm-config.yaml
+    mode: "0600"
+
+- name: Run kubeadm init
+  ansible.builtin.command: kubeadm init --config /root/kubeadm-config.yaml --upload-certs
+  when: not admin_conf.stat.exists
+
+- name: Create the .kube directory for the ubuntu user
+  ansible.builtin.file:
+    path: /home/ubuntu/.kube
+    state: directory
+    owner: ubuntu
+    group: ubuntu
+    mode: "0755"
+
+- name: Copy admin.conf for the ubuntu user
+  ansible.builtin.copy:
+    src: /etc/kubernetes/admin.conf
+    dest: /home/ubuntu/.kube/config
+    remote_src: true
+    owner: ubuntu
+    group: ubuntu
+    mode: "0600"
+
+- name: Download admin.conf to this machine
+  ansible.builtin.fetch:
+    src: /etc/kubernetes/admin.conf
+    dest: "{{ playbook_dir }}/../artifacts/kubeconfig"
+    flat: true
+
+- name: Point the local kubeconfig at the SSH tunnel (127.0.0.1:6443)
+  ansible.builtin.replace:
+    path: "{{ playbook_dir }}/../artifacts/kubeconfig"
+    regexp: 'server: https://.*'
+    replace: 'server: https://127.0.0.1:6443'
+  delegate_to: localhost
+  become: false

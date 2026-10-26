@@ -1,0 +1,40 @@
+---
+- name: Check whether this node already joined
+  ansible.builtin.stat:
+    path: /etc/kubernetes/admin.conf
+  register: admin_conf
+
+- name: Ask master-1 for a fresh join command
+  ansible.builtin.command: kubeadm token create --print-join-command
+  delegate_to: "{{ groups['masters'][0] }}"
+  register: join_cmd
+  changed_when: false
+  when: not admin_conf.stat.exists
+
+- name: Ask master-1 to upload the control plane certificates and give us the key
+  ansible.builtin.shell: kubeadm init phase upload-certs --upload-certs 2>/dev/null | tail -n 1
+  delegate_to: "{{ groups['masters'][0] }}"
+  register: cert_key
+  changed_when: false
+  when: not admin_conf.stat.exists
+
+- name: Join the cluster as a control plane node
+  ansible.builtin.command: "{{ join_cmd.stdout }} --control-plane --certificate-key {{ cert_key.stdout }}"
+  when: not admin_conf.stat.exists
+
+- name: Create the .kube directory for the ubuntu user
+  ansible.builtin.file:
+    path: /home/ubuntu/.kube
+    state: directory
+    owner: ubuntu
+    group: ubuntu
+    mode: "0755"
+
+- name: Copy admin.conf for the ubuntu user
+  ansible.builtin.copy:
+    src: /etc/kubernetes/admin.conf
+    dest: /home/ubuntu/.kube/config
+    remote_src: true
+    owner: ubuntu
+    group: ubuntu
+    mode: "0600"
