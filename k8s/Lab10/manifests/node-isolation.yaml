@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: Node
+metadata:
+  name: ivolve-m02
+  labels:
+    project: ivolve
+spec:
+  taints:
+    - key: workload
+      value: ivolveApp
+      effect: NoSchedule
