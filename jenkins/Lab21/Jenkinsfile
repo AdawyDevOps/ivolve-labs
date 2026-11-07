@@ -1,0 +1,117 @@
+pipeline {
+    agent any
+
+    options {
+        timeout(time: 30, unit: 'MINUTES')
+        disableConcurrentBuilds()
+    }
+
+    parameters {
+        booleanParam(name: 'FORCE_FAILURE', defaultValue: false,
+                     description: 'Simulate a failure after the image is built (to demonstrate the failure post action)')
+    }
+
+    environment {
+        IMAGE           = 'adawy123/demoapp'
+        FULL_IMAGE      = "${IMAGE}:${BUILD_NUMBER}"
+        K8S_NAMESPACE   = 'ivolve'
+        MANIFEST        = 'jenkins/Lab21/manifests/deployment.yaml'
+        TRIVY_EXIT_CODE = '0'
+    }
+
+    stages {
+
+        stage('Clone Source Code') {
+            steps {
+                dir('app') {
+                    git url: 'https://github.com/Ibrahim-Adel15/DemoApp.git', branch: 'main'
+                }
+            }
+        }
+
+        stage('Build App') {
+            steps {
+                dir('app') {
+                    sh 'mvn -B clean package'
+                    sh 'ls -lh target/*.jar'
+                }
+            }
+        }
+
+        stage('Build Docker Image') {
+            steps {
+                dir('app') {
+                    sh 'docker build -t ${FULL_IMAGE} .'
+                }
+            }
+        }
+
+        stage('Scan Docker Image') {
+            steps {
+                sh '''#!/bin/bash
+set -eo pipefail
+trivy image --no-progress --scanners vuln --severity HIGH,CRITICAL --exit-code ${TRIVY_EXIT_CODE} ${FULL_IMAGE} | tee trivy-report.txt
+'''
+                script {
+                    if (params.FORCE_FAILURE) {
+                        error('FORCE_FAILURE is enabled: simulated failure')
+                    }
+                }
+            }
+        }
+
+        stage('Push Image to DockerHub') {
+            steps {
+                withCredentials([usernamePassword(credentialsId: 'docker-hub-token',
+                                                  usernameVariable: 'DH_USER',
+                                                  passwordVariable: 'DH_PASS')]) {
+                    sh 'echo "$DH_PASS" | docker login -u "$DH_USER" --password-stdin'
+                    sh 'docker push ${FULL_IMAGE}'
+                }
+            }
+        }
+
+        stage('Delete Image Locally') {
+            steps {
+                sh 'docker rmi ${FULL_IMAGE}'
+            }
+        }
+
+        stage('Update Image in Deployment File') {
+            steps {
+                sh 'sed -i "s|image: ${IMAGE}:.*|image: ${FULL_IMAGE}|" ${MANIFEST}'
+                sh 'grep -n "image:" ${MANIFEST}'
+            }
+        }
+
+        stage('Deploy to Kubernetes') {
+            steps {
+                withCredentials([file(credentialsId: 'kubeconfig-jenkinssa', variable: 'KUBECONFIG')]) {
+                    sh '''
+                        kubectl apply -f ${MANIFEST}
+                        kubectl rollout status deployment/demoapp -n ${K8S_NAMESPACE} --timeout=180s
+                        kubectl get pods -n ${K8S_NAMESPACE} -l app=demoapp -o wide
+                    '''
+                }
+            }
+        }
+    }
+
+    post {
+        always {
+            echo "Pipeline #${env.BUILD_NUMBER} finished with status: ${currentBuild.currentResult}"
+            sh 'docker logout || true'
+            archiveArtifacts artifacts: 'trivy-report.txt', allowEmptyArchive: true
+        }
+        success {
+            echo "SUCCESS: ${env.FULL_IMAGE} was built, scanned, pushed and deployed to namespace ${env.K8S_NAMESPACE}"
+        }
+        failure {
+            echo 'FAILURE: check the stage that failed in the console output'
+            sh 'docker rmi -f ${FULL_IMAGE} || true'
+        }
+        cleanup {
+            deleteDir()
+        }
+    }
+}

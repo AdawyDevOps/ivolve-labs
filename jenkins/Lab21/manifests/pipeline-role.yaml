@@ -1,0 +1,26 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: ivolvepipelinerole
+  namespace: ivolve
+rules:
+  - apiGroups: ["apps"]
+    resources: ["deployments"]
+    verbs: ["get", "list", "watch", "create", "update", "patch"]
+  - apiGroups: [""]
+    resources: ["pods"]
+    verbs: ["get", "list", "watch"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: ivolvepipelinerolebinding
+  namespace: ivolve
+subjects:
+  - kind: ServiceAccount
+    name: jenkinssa
+    namespace: ivolve
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: ivolvepipelinerole
