@@ -1,0 +1,12 @@
+---
+- name: Configure managed node using Ansible roles
+  hosts: managed_nodes
+  become: true
+
+  vars:
+    kubectl_version: "v1.31.0"
+
+  roles:
+    - docker
+    - kubectl
+    - jenkins

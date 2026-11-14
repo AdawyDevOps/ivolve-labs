@@ -1,0 +1,27 @@
+---
+- name: Install Docker and prerequisites
+  ansible.builtin.apt:
+    name:
+      - docker.io
+      - ca-certificates
+    state: present
+    update_cache: true
+    cache_valid_time: 3600
+
+- name: Ensure Docker is started and enabled
+  ansible.builtin.service:
+    name: docker
+    state: started
+    enabled: true
+
+- name: Verify Docker installation
+  ansible.builtin.command: docker --version
+  register: docker_version_output
+  changed_when: false
+
+- name: Display Docker version
+  ansible.builtin.debug:
+    var: docker_version_output.stdout
+
+    
+# tasks file for roles/docker
