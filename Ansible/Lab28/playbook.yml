@@ -1,0 +1,109 @@
+
+---
+- name: Configure Managed Node with Docker, Kubectl, and Jenkins
+  hosts: all
+  become: true
+
+  vars:
+    kubectl_version: "v1.31.0"
+
+  tasks:
+    # ==================== 1. Install Prerequisites ====================
+    - name: Update APT cache and install prerequisite packages
+      ansible.builtin.apt:
+        name:
+          - ca-certificates
+          - curl
+          - gnupg
+          - fontconfig
+          - openjdk-21-jre
+        state: present
+        update_cache: true
+        cache_valid_time: 3600
+
+    # ==================== 2. Install Docker ====================
+    - name: Install Docker
+      ansible.builtin.apt:
+        name: docker.io
+        state: present
+        update_cache: true
+
+    - name: Ensure Docker service is started and enabled
+      ansible.builtin.service:
+        name: docker
+        state: started
+        enabled: true
+
+    # ==================== 3. Install Kubectl ====================
+    - name: Download kubectl binary
+      ansible.builtin.get_url:
+        url: "https://dl.k8s.io/release/{{ kubectl_version }}/bin/linux/amd64/kubectl"
+        dest: /usr/local/bin/kubectl
+        mode: "0755"
+        owner: root
+        group: root
+
+    # ==================== 4. Configure Jenkins Repository ====================
+    - name: Download Jenkins GPG key
+      ansible.builtin.get_url:
+        url: https://pkg.jenkins.io/debian-stable/jenkins.io-2026.key
+        dest: /etc/apt/keyrings/jenkins-keyring.asc
+        mode: "0644"
+        force: true
+
+    - name: Add Jenkins APT repository
+      ansible.builtin.apt_repository:
+        repo: "deb [signed-by=/etc/apt/keyrings/jenkins-keyring.asc] https://pkg.jenkins.io/debian-stable binary/"
+        state: present
+        filename: jenkins
+        update_cache: true
+
+    # ==================== 5. Install Jenkins ====================
+    - name: Install Jenkins
+      ansible.builtin.apt:
+        name: jenkins
+        state: present
+        update_cache: true
+
+    # ==================== 6. Configure Docker Access ====================
+    - name: Add Jenkins user to Docker group
+      ansible.builtin.user:
+        name: jenkins
+        groups: docker
+        append: true
+
+    # ==================== 7. Start Jenkins ====================
+    - name: Ensure Jenkins service is started and enabled
+      ansible.builtin.service:
+        name: jenkins
+        state: started
+        enabled: true
+
+    # ==================== 8. Verify Installation ====================
+    - name: Verify Docker version
+      ansible.builtin.command: docker --version
+      register: docker_version_output
+      changed_when: false
+
+    - name: Verify kubectl version
+      ansible.builtin.command: kubectl version --client
+      register: kubectl_version_output
+      changed_when: false
+
+    - name: Verify Java version
+      ansible.builtin.command: java -version
+      register: java_version_output
+      changed_when: false
+      failed_when: false
+
+    - name: Verify Jenkins service
+      ansible.builtin.command: systemctl is-active jenkins
+      register: jenkins_status
+      changed_when: false
+
+    - name: Display installation results
+      ansible.builtin.debug:
+        msg:
+          - "{{ docker_version_output.stdout }}"
+          - "{{ kubectl_version_output.stdout }}"
+          - "Jenkins service status: {{ jenkins_status.stdout }}"
