@@ -1,0 +1,4 @@
+# defaults file for roles/mysql
+---
+mysql_database: ivolve
+mysql_user: ivolveuser

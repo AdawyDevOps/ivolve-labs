@@ -1,0 +1,30 @@
+# tasks file for roles/mysql
+---
+- name: Install MySQL server and Python MySQL driver
+  ansible.builtin.apt:
+    name:
+      - mysql-server
+      - python3-pymysql
+    state: present
+    update_cache: true
+
+- name: Ensure MySQL service is running
+  ansible.builtin.service:
+    name: mysql
+    state: started
+    enabled: true
+
+- name: Create ivolve database
+  community.mysql.mysql_db:
+    name: "{{ mysql_database }}"
+    state: present
+    login_unix_socket: /var/run/mysqld/mysqld.sock
+
+- name: Create ivolveuser with database privileges
+  community.mysql.mysql_user:
+    name: "{{ mysql_user }}"
+    host: localhost
+    password: "{{ mysql_app_password }}"
+    priv: "{{ mysql_database }}.*:ALL"
+    state: present
+    login_unix_socket: /var/run/mysqld/mysqld.sock

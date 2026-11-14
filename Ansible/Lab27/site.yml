@@ -1,0 +1,7 @@
+---
+- name: Configure MySQL using Ansible Vault
+  hosts: managed_nodes
+  become: true
+
+  roles:
+    - mysql
