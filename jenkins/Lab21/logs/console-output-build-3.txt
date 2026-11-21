@@ -1,0 +1,730 @@
+Started by user Ahmed Ibrahim Adawy
+Obtained jenkins/Lab21/Jenkinsfile from git https://github.com/AdawyDevOps/ivolve-labs.git
+[Pipeline] Start of Pipeline
+[Pipeline] node
+Running on Jenkins in /var/jenkins_home/workspace/demoapp-pipeline
+[Pipeline] {
+[Pipeline] stage
+[Pipeline] { (Declarative: Checkout SCM)
+[Pipeline] checkout
+The recommended git tool is: git
+No credentials specified
+Cloning the remote Git repository
+Cloning repository https://github.com/AdawyDevOps/ivolve-labs.git
+ > git init /var/jenkins_home/workspace/demoapp-pipeline # timeout=10
+Fetching upstream changes from https://github.com/AdawyDevOps/ivolve-labs.git
+ > git --version # timeout=10
+ > git --version # 'git version 2.47.3'
+ > git fetch --tags --force --progress -- https://github.com/AdawyDevOps/ivolve-labs.git +refs/heads/*:refs/remotes/origin/* # timeout=10
+ > git config remote.origin.url https://github.com/AdawyDevOps/ivolve-labs.git # timeout=10
+ > git config --add remote.origin.fetch +refs/heads/*:refs/remotes/origin/* # timeout=10
+Avoid second fetch
+ > git rev-parse refs/remotes/origin/main^{commit} # timeout=10
+Checking out Revision 55ae5f75c34260244ce8ecef62b59078b36099aa (refs/remotes/origin/main)
+ > git config core.sparsecheckout # timeout=10
+ > git checkout -f 55ae5f75c34260244ce8ecef62b59078b36099aa # timeout=10
+Commit message: "Lab21: separate Trivy DB update stage, skip DB update in scan, retry push"
+ > git rev-list --no-walk b3cfef8121b1d796dff95d66ee9e0773c05f87ac # timeout=10
+[Pipeline] }
+[Pipeline] // stage
+[Pipeline] withEnv
+[Pipeline] {
+[Pipeline] withEnv
+[Pipeline] {
+[Pipeline] timeout
+Timeout set to expire in 45 min
+[Pipeline] {
+[Pipeline] stage
+[Pipeline] { (Clone Source Code)
+[Pipeline] dir
+Running in /var/jenkins_home/workspace/demoapp-pipeline/app
+[Pipeline] {
+[Pipeline] git
+The recommended git tool is: NONE
+No credentials specified
+Cloning the remote Git repository
+Cloning repository https://github.com/Ibrahim-Adel15/DemoApp.git
+ > git init /var/jenkins_home/workspace/demoapp-pipeline/app # timeout=10
+Fetching upstream changes from https://github.com/Ibrahim-Adel15/DemoApp.git
+ > git --version # timeout=10
+ > git --version # 'git version 2.47.3'
+ > git fetch --tags --force --progress -- https://github.com/Ibrahim-Adel15/DemoApp.git +refs/heads/*:refs/remotes/origin/* # timeout=10
+ > git config remote.origin.url https://github.com/Ibrahim-Adel15/DemoApp.git # timeout=10
+ > git config --add remote.origin.fetch +refs/heads/*:refs/remotes/origin/* # timeout=10
+Avoid second fetch
+ > git rev-parse refs/remotes/origin/main^{commit} # timeout=10
+Checking out Revision f37bb9984451bd6db859cbacad32ecbe472f003d (refs/remotes/origin/main)
+ > git config core.sparsecheckout # timeout=10
+ > git checkout -f f37bb9984451bd6db859cbacad32ecbe472f003d # timeout=10
+ > git branch -a -v --no-abbrev # timeout=10
+ > git checkout -b main f37bb9984451bd6db859cbacad32ecbe472f003d # timeout=10
+Commit message: "Add files via upload"
+ > git rev-list --no-walk f37bb9984451bd6db859cbacad32ecbe472f003d # timeout=10
+[Pipeline] }
+[Pipeline] // dir
+[Pipeline] }
+[Pipeline] // stage
+[Pipeline] stage
+[Pipeline] { (Prepare Trivy DB)
+[Pipeline] retry
+[Pipeline] {
+[Pipeline] timeout
+Timeout set to expire in 20 min
+[Pipeline] {
+[Pipeline] sh
+[Pipeline] }
+[Pipeline] // timeout
+[Pipeline] }
+[Pipeline] // retry
+[Pipeline] }
+[Pipeline] // stage
+[Pipeline] stage
+[Pipeline] { (Build App)
+[Pipeline] dir
+Running in /var/jenkins_home/workspace/demoapp-pipeline/app
+[Pipeline] {
+[Pipeline] sh
++ mvn -B clean package
+[INFO] Scanning for projects...
+[INFO] 
+[INFO] --------------------------< com.example:demo >--------------------------
+[INFO] Building demo 0.0.1-SNAPSHOT
+[INFO]   from pom.xml
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO] 
+[INFO] --- clean:3.3.2:clean (default-clean) @ demo ---
+[INFO] 
+[INFO] --- resources:3.3.1:resources (default-resources) @ demo ---
+[INFO] skip non existing resourceDirectory /var/jenkins_home/workspace/demoapp-pipeline/app/src/main/resources
+[INFO] skip non existing resourceDirectory /var/jenkins_home/workspace/demoapp-pipeline/app/src/main/resources
+[INFO] 
+[INFO] --- compiler:3.11.0:compile (default-compile) @ demo ---
+[INFO] Changes detected - recompiling the module! :source
+[INFO] Compiling 1 source file with javac [debug release 17] to target/classes
+[INFO] 
+[INFO] --- resources:3.3.1:testResources (default-testResources) @ demo ---
+[INFO] skip non existing resourceDirectory /var/jenkins_home/workspace/demoapp-pipeline/app/src/test/resources
+[INFO] 
+[INFO] --- compiler:3.11.0:testCompile (default-testCompile) @ demo ---
+[INFO] No sources to compile
+[INFO] 
+[INFO] --- surefire:3.1.2:test (default-test) @ demo ---
+[INFO] No tests to run.
+[INFO] 
+[INFO] --- jar:3.3.0:jar (default-jar) @ demo ---
+[INFO] Building jar: /var/jenkins_home/workspace/demoapp-pipeline/app/target/demo-0.0.1-SNAPSHOT.jar
+[INFO] 
+[INFO] --- spring-boot:3.2.0:repackage (repackage) @ demo ---
+[INFO] Replacing main artifact /var/jenkins_home/workspace/demoapp-pipeline/app/target/demo-0.0.1-SNAPSHOT.jar with repackaged archive, adding nested dependencies in BOOT-INF/.
+[INFO] The original artifact has been renamed to /var/jenkins_home/workspace/demoapp-pipeline/app/target/demo-0.0.1-SNAPSHOT.jar.original
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESS
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time:  38.513 s
+[INFO] Finished at: 2026-11-21T09:26:21Z
+[INFO] ------------------------------------------------------------------------
+[Pipeline] sh
++ ls -lh target/demo-0.0.1-SNAPSHOT.jar
+-rw-r--r-- 1 root root 19M Nov 21 09:26 target/demo-0.0.1-SNAPSHOT.jar
+[Pipeline] }
+[Pipeline] // dir
+[Pipeline] }
+[Pipeline] // stage
+[Pipeline] stage
+[Pipeline] { (Build Docker Image)
+[Pipeline] dir
+Running in /var/jenkins_home/workspace/demoapp-pipeline/app
+[Pipeline] {
+[Pipeline] sh
++ docker build -t adawy123/demoapp:3 .
+DEPRECATED: The legacy builder is deprecated and will be removed in a future release.
+            Install the buildx component to build images with BuildKit:
+            https://docs.docker.com/go/buildx/
+
+Sending build context to Docker daemon  19.72MB
+Step 1/5 : FROM maven:sapmachine
+ ---> dff8a2b7cb17
+Step 2/5 : WORKDIR /app
+ ---> Using cache
+ ---> ca4757266d6c
+Step 3/5 : COPY target/demo-0.0.1-SNAPSHOT.jar .
+ ---> cb7f3656f098
+Step 4/5 : CMD ["java", "-jar", "demo-0.0.1-SNAPSHOT.jar"]
+ ---> Running in 82c0eccce836
+ ---> Removed intermediate container 82c0eccce836
+ ---> 3f2355009084
+Step 5/5 : EXPOSE 8080
+ ---> Running in 995866fcbb34
+ ---> Removed intermediate container 995866fcbb34
+ ---> cc01cabc5aea
+Successfully built cc01cabc5aea
+Successfully tagged adawy123/demoapp:3
+[Pipeline] }
+[Pipeline] // dir
+[Pipeline] }
+[Pipeline] // stage
+[Pipeline] stage
+[Pipeline] { (Scan Docker Image)
+[Pipeline] sh
+2026-11-21T09:27:48Z	INFO	[vuln] Vulnerability scanning is enabled
+2026-11-21T09:30:14Z	INFO	Detected OS	family="ubuntu" version="24.04"
+2026-11-21T09:30:14Z	INFO	[ubuntu] Detecting vulnerabilities...	os_version="24.04" pkg_num=146
+2026-11-21T09:30:15Z	INFO	Number of language-specific files	num=1
+2026-11-21T09:30:15Z	INFO	[jar] Detecting vulnerabilities...
+2026-11-21T09:30:16Z	INFO	Table result includes only package filenames. Use '--format json' option to get the full path to the package file.
+
+Report Summary
+
+┌────────────────────────────────────────────────────────────────┬────────┬─────────────────┐
+│                             Target                             │  Type  │ Vulnerabilities │
+├────────────────────────────────────────────────────────────────┼────────┼─────────────────┤
+│ adawy123/demoapp:3 (ubuntu 24.04)                              │ ubuntu │        2        │
+├────────────────────────────────────────────────────────────────┼────────┼─────────────────┤
+│ app/demo-0.0.1-SNAPSHOT.jar                                    │  jar   │       46        │
+├────────────────────────────────────────────────────────────────┼────────┼─────────────────┤
+│ usr/lib/jvm/sapmachine-27/lib/agent-boot.jar                   │  jar   │        0        │
+├────────────────────────────────────────────────────────────────┼────────┼─────────────────┤
+│ usr/lib/jvm/sapmachine-27/lib/agent.jar                        │  jar   │        0        │
+├────────────────────────────────────────────────────────────────┼────────┼─────────────────┤
+│ usr/share/maven/boot/plexus-classworlds-2.12.1.jar             │  jar   │        0        │
+├────────────────────────────────────────────────────────────────┼────────┼─────────────────┤
+│ usr/share/maven/lib/aopalliance-1.0.jar                        │  jar   │        0        │
+├────────────────────────────────────────────────────────────────┼────────┼─────────────────┤
+│ usr/share/maven/lib/asm-9.10.1.jar                             │  jar   │        0        │
+├────────────────────────────────────────────────────────────────┼────────┼─────────────────┤
+│ usr/share/maven/lib/commons-cli-1.11.0.jar                     │  jar   │        0        │
+├────────────────────────────────────────────────────────────────┼────────┼─────────────────┤
+│ usr/share/maven/lib/commons-codec-1.22.1.jar                   │  jar   │        0        │
+├────────────────────────────────────────────────────────────────┼────────┼─────────────────┤
+│ usr/share/maven/lib/error_prone_annotations-2.48.0.jar         │  jar   │        0        │
+├────────────────────────────────────────────────────────────────┼────────┼─────────────────┤
+│ usr/share/maven/lib/failureaccess-1.0.3.jar                    │  jar   │        0        │
+├────────────────────────────────────────────────────────────────┼────────┼─────────────────┤
+│ usr/share/maven/lib/gson-2.14.0.jar                            │  jar   │        0        │
+├────────────────────────────────────────────────────────────────┼────────┼─────────────────┤
+│ usr/share/maven/lib/guava-33.7.1-jre.jar                       │  jar   │        1        │
+├────────────────────────────────────────────────────────────────┼────────┼─────────────────┤
+│ usr/share/maven/lib/guice-5.1.0-classes.jar                    │  jar   │        0        │
+├────────────────────────────────────────────────────────────────┼────────┼─────────────────┤
+│ usr/share/maven/lib/httpclient-4.5.14.jar                      │  jar   │        0        │
+├────────────────────────────────────────────────────────────────┼────────┼─────────────────┤
+│ usr/share/maven/lib/httpcore-4.4.16.jar                        │  jar   │        0        │
+├────────────────────────────────────────────────────────────────┼────────┼─────────────────┤
+│ usr/share/maven/lib/jansi-core-3.30.17.jar                     │  jar   │        0        │
+├────────────────────────────────────────────────────────────────┼────────┼─────────────────┤
+│ usr/share/maven/lib/javax.annotation-api-1.3.2.jar             │  jar   │        0        │
+├────────────────────────────────────────────────────────────────┼────────┼─────────────────┤
+│ usr/share/maven/lib/javax.inject-1.jar                         │  jar   │        0        │
+├────────────────────────────────────────────────────────────────┼────────┼─────────────────┤
+│ usr/share/maven/lib/jcl-over-slf4j-2.0.19.jar                  │  jar   │        0        │
+├────────────────────────────────────────────────────────────────┼────────┼─────────────────┤
+│ usr/share/maven/lib/jline-native-3.30.17.jar                   │  jar   │        0        │
+├────────────────────────────────────────────────────────────────┼────────┼─────────────────┤
+│ usr/share/maven/lib/jline-terminal-3.30.17.jar                 │  jar   │        0        │
+├────────────────────────────────────────────────────────────────┼────────┼─────────────────┤
+│ usr/share/maven/lib/jline-terminal-ffm-3.30.17.jar             │  jar   │        0        │
+├────────────────────────────────────────────────────────────────┼────────┼─────────────────┤
+│ usr/share/maven/lib/jline-terminal-jni-3.30.17.jar             │  jar   │        0        │
+├────────────────────────────────────────────────────────────────┼────────┼─────────────────┤
+│ usr/share/maven/lib/jspecify-1.0.1.jar                         │  jar   │        0        │
+├────────────────────────────────────────────────────────────────┼────────┼─────────────────┤
+│ usr/share/maven/lib/maven-artifact-3.10.0.jar                  │  jar   │        0        │
+├────────────────────────────────────────────────────────────────┼────────┼─────────────────┤
+│ usr/share/maven/lib/maven-builder-support-3.10.0.jar           │  jar   │        0        │
+├────────────────────────────────────────────────────────────────┼────────┼─────────────────┤
+│ usr/share/maven/lib/maven-compat-3.10.0.jar                    │  jar   │        0        │
+├────────────────────────────────────────────────────────────────┼────────┼─────────────────┤
+│ usr/share/maven/lib/maven-core-3.10.0.jar                      │  jar   │        0        │
+├────────────────────────────────────────────────────────────────┼────────┼─────────────────┤
+│ usr/share/maven/lib/maven-embedder-3.10.0.jar                  │  jar   │        0        │
+├────────────────────────────────────────────────────────────────┼────────┼─────────────────┤
+│ usr/share/maven/lib/maven-jline-3.10.0.jar                     │  jar   │        0        │
+├────────────────────────────────────────────────────────────────┼────────┼─────────────────┤
+│ usr/share/maven/lib/maven-model-3.10.0.jar                     │  jar   │        0        │
+├────────────────────────────────────────────────────────────────┼────────┼─────────────────┤
+│ usr/share/maven/lib/maven-model-builder-3.10.0.jar             │  jar   │        0        │
+├────────────────────────────────────────────────────────────────┼────────┼─────────────────┤
+│ usr/share/maven/lib/maven-plugin-api-3.10.0.jar                │  jar   │        0        │
+├────────────────────────────────────────────────────────────────┼────────┼─────────────────┤
+│ usr/share/maven/lib/maven-repository-metadata-3.10.0.jar       │  jar   │        0        │
+├────────────────────────────────────────────────────────────────┼────────┼─────────────────┤
+│ usr/share/maven/lib/maven-resolver-api-2.0.24.jar              │  jar   │        0        │
+├────────────────────────────────────────────────────────────────┼────────┼─────────────────┤
+│ usr/share/maven/lib/maven-resolver-connector-basic-2.0.24.jar  │  jar   │        0        │
+├────────────────────────────────────────────────────────────────┼────────┼─────────────────┤
+│ usr/share/maven/lib/maven-resolver-impl-2.0.24.jar             │  jar   │        0        │
+├────────────────────────────────────────────────────────────────┼────────┼─────────────────┤
+│ usr/share/maven/lib/maven-resolver-named-locks-2.0.24.jar      │  jar   │        0        │
+├────────────────────────────────────────────────────────────────┼────────┼─────────────────┤
+│ usr/share/maven/lib/maven-resolver-provider-3.10.0.jar         │  jar   │        0        │
+├────────────────────────────────────────────────────────────────┼────────┼─────────────────┤
+│ usr/share/maven/lib/maven-resolver-spi-2.0.24.jar              │  jar   │        0        │
+├────────────────────────────────────────────────────────────────┼────────┼─────────────────┤
+│ usr/share/maven/lib/maven-resolver-transport-apache-2.0.24.jar │  jar   │        0        │
+├────────────────────────────────────────────────────────────────┼────────┼─────────────────┤
+│ usr/share/maven/lib/maven-resolver-transport-file-2.0.24.jar   │  jar   │        0        │
+├────────────────────────────────────────────────────────────────┼────────┼─────────────────┤
+│ usr/share/maven/lib/maven-resolver-transport-wagon-2.0.24.jar  │  jar   │        0        │
+├────────────────────────────────────────────────────────────────┼────────┼─────────────────┤
+│ usr/share/maven/lib/maven-resolver-util-2.0.24.jar             │  jar   │        0        │
+├────────────────────────────────────────────────────────────────┼────────┼─────────────────┤
+│ usr/share/maven/lib/maven-settings-3.10.0.jar                  │  jar   │        0        │
+├────────────────────────────────────────────────────────────────┼────────┼─────────────────┤
+│ usr/share/maven/lib/maven-settings-builder-3.10.0.jar          │  jar   │        0        │
+├────────────────────────────────────────────────────────────────┼────────┼─────────────────┤
+│ usr/share/maven/lib/maven-slf4j-provider-3.10.0.jar            │  jar   │        0        │
+├────────────────────────────────────────────────────────────────┼────────┼─────────────────┤
+│ usr/share/maven/lib/org.eclipse.sisu.inject-1.1.0.jar          │  jar   │        0        │
+├────────────────────────────────────────────────────────────────┼────────┼─────────────────┤
+│ usr/share/maven/lib/org.eclipse.sisu.plexus-1.1.0.jar          │  jar   │        0        │
+├────────────────────────────────────────────────────────────────┼────────┼─────────────────┤
+│ usr/share/maven/lib/plexus-cipher-2.0.jar                      │  jar   │        0        │
+├────────────────────────────────────────────────────────────────┼────────┼─────────────────┤
+│ usr/share/maven/lib/plexus-component-annotations-2.2.0.jar     │  jar   │        0        │
+├────────────────────────────────────────────────────────────────┼────────┼─────────────────┤
+│ usr/share/maven/lib/plexus-interpolation-1.30.0.jar            │  jar   │        0        │
+├────────────────────────────────────────────────────────────────┼────────┼─────────────────┤
+│ usr/share/maven/lib/plexus-sec-dispatcher-2.0.jar              │  jar   │        0        │
+├────────────────────────────────────────────────────────────────┼────────┼─────────────────┤
+│ usr/share/maven/lib/plexus-utils-3.6.2.jar                     │  jar   │        0        │
+├────────────────────────────────────────────────────────────────┼────────┼─────────────────┤
+│ usr/share/maven/lib/slf4j-api-2.0.19.jar                       │  jar   │        0        │
+├────────────────────────────────────────────────────────────────┼────────┼─────────────────┤
+│ usr/share/maven/lib/wagon-file-3.5.3.jar                       │  jar   │        0        │
+├────────────────────────────────────────────────────────────────┼────────┼─────────────────┤
+│ usr/share/maven/lib/wagon-http-3.5.3.jar                       │  jar   │        0        │
+├────────────────────────────────────────────────────────────────┼────────┼─────────────────┤
+│ usr/share/maven/lib/wagon-http-shared-3.5.3.jar                │  jar   │        0        │
+├────────────────────────────────────────────────────────────────┼────────┼─────────────────┤
+│ usr/share/maven/lib/wagon-provider-api-3.5.3.jar               │  jar   │        0        │
+└────────────────────────────────────────────────────────────────┴────────┴─────────────────┘
+Legend:
+- '-': Not scanned
+- '0': Clean (no security findings detected)
+
+
+For OSS Maintainers: VEX Notice
+--------------------------------
+If you're an OSS maintainer and Trivy has detected vulnerabilities in your project that you believe are not actually exploitable, consider issuing a VEX (Vulnerability Exploitability eXchange) statement.
+VEX allows you to communicate the actual status of vulnerabilities in your project, improving security transparency and reducing false positives for your users.
+Learn more and start using VEX: https://trivy.dev/docs/v0.76/guide/supply-chain/vex/repo#publishing-vex-documents
+
+To disable this notice, set the TRIVY_DISABLE_VEX_NOTICE environment variable.
+
+
+adawy123/demoapp:3 (ubuntu 24.04)
+=================================
+Total: 2 (HIGH: 2, CRITICAL: 0)
+
+┌──────────────────┬─────────────────┬──────────┬────────┬───────────────────┬────────────────┬────────────────────────────────────────────────────────────┐
+│     Library      │  Vulnerability  │ Severity │ Status │ Installed Version │ Fixed Version  │                           Title                            │
+├──────────────────┼─────────────────┼──────────┼────────┼───────────────────┼────────────────┼────────────────────────────────────────────────────────────┤
+│ apt              │ CVE-2026-109518 │ HIGH     │ fixed  │ 2.8.3             │ 2.8.4ubuntu0.1 │ apt: apt: Remote code execution via hard link reuse during │
+│                  │                 │          │        │                   │                │ package download...                                        │
+│                  │                 │          │        │                   │                │ https://avd.aquasec.com/nvd/cve-2026-109518                │
+├──────────────────┤                 │          │        │                   │                │                                                            │
+│ libapt-pkg6.0t64 │                 │          │        │                   │                │                                                            │
+│                  │                 │          │        │                   │                │                                                            │
+│                  │                 │          │        │                   │                │                                                            │
+└──────────────────┴─────────────────┴──────────┴────────┴───────────────────┴────────────────┴────────────────────────────────────────────────────────────┘
+
+Java (jar)
+==========
+Total: 47 (HIGH: 38, CRITICAL: 9)
+
+┌─────────────────────────────────────────────────────────────┬─────────────────┬──────────┬────────┬───────────────────┬─────────────────────────────┬──────────────────────────────────────────────────────────────┐
+│                           Library                           │  Vulnerability  │ Severity │ Status │ Installed Version │        Fixed Version        │                            Title                             │
+├─────────────────────────────────────────────────────────────┼─────────────────┼──────────┼────────┼───────────────────┼─────────────────────────────┼──────────────────────────────────────────────────────────────┤
+│ ch.qos.logback:logback-classic (demo-0.0.1-SNAPSHOT.jar)    │ CVE-2023-6378   │ HIGH     │ fixed  │ 1.4.11            │ 1.3.12, 1.4.12, 1.2.13      │ logback: serialization vulnerability in logback receiver     │
+│                                                             │                 │          │        │                   │                             │ https://avd.aquasec.com/nvd/cve-2023-6378                    │
+├─────────────────────────────────────────────────────────────┤                 │          │        │                   │                             │                                                              │
+│ ch.qos.logback:logback-core (demo-0.0.1-SNAPSHOT.jar)       │                 │          │        │                   │                             │                                                              │
+│                                                             │                 │          │        │                   │                             │                                                              │
+├─────────────────────────────────────────────────────────────┼─────────────────┤          │        ├───────────────────┼─────────────────────────────┼──────────────────────────────────────────────────────────────┤
+│ com.fasterxml.jackson.core:jackson-core                     │ CVE-2026-68494  │          │        │ 2.15.3            │ 2.18.8, 2.21.4              │ com.fasterxml.jackson.core/jackson-core:                     │
+│ (demo-0.0.1-SNAPSHOT.jar)                                   │                 │          │        │                   │                             │ tools.jackson.core/jackson-core: jackson-core: Denial of     │
+│                                                             │                 │          │        │                   │                             │ Service via incomplete fix in async JSON...                  │
+│                                                             │                 │          │        │                   │                             │ https://avd.aquasec.com/nvd/cve-2026-68494                   │
+│                                                             ├─────────────────┤          │        │                   ├─────────────────────────────┼──────────────────────────────────────────────────────────────┤
+│                                                             │ CVE-2026-89425  │          │        │                   │ 2.21.7, 2.22.3, 2.18.11     │ com.fasterxml.jackson.core/jackson-core: Jackson-core:       │
+│                                                             │                 │          │        │                   │                             │ Denial of Service via unbounded StringBuilder growth during  │
+│                                                             │                 │          │        │                   │                             │ malformed token...                                           │
+│                                                             │                 │          │        │                   │                             │ https://avd.aquasec.com/nvd/cve-2026-89425                   │
+├─────────────────────────────────────────────────────────────┼─────────────────┤          │        │                   ├─────────────────────────────┼──────────────────────────────────────────────────────────────┤
+│ com.fasterxml.jackson.core:jackson-databind                 │ CVE-2026-54512  │          │        │                   │ 2.18.8, 3.1.4, 2.21.4       │ jackson-databind: jackson-databind: Arbitrary code execution │
+│ (demo-0.0.1-SNAPSHOT.jar)                                   │                 │          │        │                   │                             │ via PolymorphicTypeValidator bypass                          │
+│                                                             │                 │          │        │                   │                             │ https://avd.aquasec.com/nvd/cve-2026-54512                   │
+│                                                             ├─────────────────┤          │        │                   ├─────────────────────────────┼──────────────────────────────────────────────────────────────┤
+│                                                             │ CVE-2026-54513  │          │        │                   │ 2.18.8, 2.21.4, 3.1.4       │ jackson-databind: Jackson-databind: Security bypass allows   │
+│                                                             │                 │          │        │                   │                             │ arbitrary code execution                                     │
+│                                                             │                 │          │        │                   │                             │ https://avd.aquasec.com/nvd/cve-2026-54513                   │
+│                                                             ├─────────────────┤          │        │                   ├─────────────────────────────┼──────────────────────────────────────────────────────────────┤
+│                                                             │ CVE-2026-68497  │          │        │                   │ 2.18.10, 2.21.6, 2.22.2     │ com.fasterxml.jackson.core/jackson-databind:                 │
+│                                                             │                 │          │        │                   │                             │ tools.jackson.core/jackson-databind: jackson-databind: CPU   │
+│                                                             │                 │          │        │                   │                             │ Denial of Service via unbounded numeric parsing              │
+│                                                             │                 │          │        │                   │                             │ https://avd.aquasec.com/nvd/cve-2026-68497                   │
+│                                                             ├─────────────────┤          │        │                   ├─────────────────────────────┼──────────────────────────────────────────────────────────────┤
+│                                                             │ CVE-2026-91776  │          │        │                   │ 2.18.11, 2.21.7, 2.22.3     │ jackson-databind: com.fasterxml.jackson/jackson-core:        │
+│                                                             │                 │          │        │                   │                             │ jackson-databind: Denial of Service via unbounded cache      │
+│                                                             │                 │          │        │                   │                             │ growth in TypeDeserializerBase...                            │
+│                                                             │                 │          │        │                   │                             │ https://avd.aquasec.com/nvd/cve-2026-91776                   │
+│                                                             ├─────────────────┤          │        │                   ├─────────────────────────────┼──────────────────────────────────────────────────────────────┤
+│                                                             │ CVE-2026-91777  │          │        │                   │ 2.21.7, 2.18.11, 2.22.3     │ com.fasterxml.jackson.core/jackson-databind:                 │
+│                                                             │                 │          │        │                   │                             │ tools.jackson.core:jackson-databind: Jackson-databind:       │
+│                                                             │                 │          │        │                   │                             │ Denial of Service via quadratic forward-reference completion │
+│                                                             │                 │          │        │                   │                             │ https://avd.aquasec.com/nvd/cve-2026-91777                   │
+├─────────────────────────────────────────────────────────────┼─────────────────┤          │        ├───────────────────┼─────────────────────────────┼──────────────────────────────────────────────────────────────┤
+│ com.google.guava:guava (guava-33.7.1-jre.jar)               │ CVE-2026-102554 │          │        │ 33.7.1-jre        │ 33.7.2                      │ com.google.guava/guava: Google Guava: Denial of Service via  │
+│                                                             │                 │          │        │                   │                             │ unthrottled memory allocation during deserialization...      │
+│                                                             │                 │          │        │                   │                             │ https://avd.aquasec.com/nvd/cve-2026-102554                  │
+├─────────────────────────────────────────────────────────────┼─────────────────┼──────────┤        ├───────────────────┼─────────────────────────────┼──────────────────────────────────────────────────────────────┤
+│ org.apache.tomcat.embed:tomcat-embed-core                   │ CVE-2025-24813  │ CRITICAL │        │ 10.1.16           │ 11.0.3, 10.1.35, 9.0.99     │ tomcat: Potential RCE and/or information disclosure and/or   │
+│ (demo-0.0.1-SNAPSHOT.jar)                                   │                 │          │        │                   │                             │ information corruption with partial PUT...                   │
+│                                                             │                 │          │        │                   │                             │ https://avd.aquasec.com/nvd/cve-2025-24813                   │
+│                                                             ├─────────────────┤          │        │                   ├─────────────────────────────┼──────────────────────────────────────────────────────────────┤
+│                                                             │ CVE-2026-41293  │          │        │                   │ 9.0.118, 10.1.55, 11.0.22   │ tomcat-coyote: Apache Tomcat: HTTP/2 request headers not     │
+│                                                             │                 │          │        │                   │                             │ validated                                                    │
+│                                                             │                 │          │        │                   │                             │ https://avd.aquasec.com/nvd/cve-2026-41293                   │
+│                                                             ├─────────────────┤          │        │                   │                             ├──────────────────────────────────────────────────────────────┤
+│                                                             │ CVE-2026-43512  │          │        │                   │                             │ tomcat-coyote: Apache Tomcat: Authentication bypass via      │
+│                                                             │                 │          │        │                   │                             │ digest authentication                                        │
+│                                                             │                 │          │        │                   │                             │ https://avd.aquasec.com/nvd/cve-2026-43512                   │
+│                                                             ├─────────────────┤          │        │                   │                             ├──────────────────────────────────────────────────────────────┤
+│                                                             │ CVE-2026-43515  │          │        │                   │                             │ tomcat-coyote: tomcat: Improper Authorization allows         │
+│                                                             │                 │          │        │                   │                             │ security bypass                                              │
+│                                                             │                 │          │        │                   │                             │ https://avd.aquasec.com/nvd/cve-2026-43515                   │
+│                                                             ├─────────────────┤          │        │                   ├─────────────────────────────┼──────────────────────────────────────────────────────────────┤
+│                                                             │ CVE-2026-55276  │          │        │                   │ 11.0.23, 10.1.56, 9.0.119   │ tomcat: Apache Tomcat: Misleading security logs due to       │
+│                                                             │                 │          │        │                   │                             │ incorrect control flow                                       │
+│                                                             │                 │          │        │                   │                             │ https://avd.aquasec.com/nvd/cve-2026-55276                   │
+│                                                             ├─────────────────┤          │        │                   ├─────────────────────────────┼──────────────────────────────────────────────────────────────┤
+│                                                             │ CVE-2026-65182  │          │        │                   │ 11.0.25, 10.1.58, 9.0.121   │ tomcat: Apache Tomcat: Security constraint bypass due to     │
+│                                                             │                 │          │        │                   │                             │ improper access control                                      │
+│                                                             │                 │          │        │                   │                             │ https://avd.aquasec.com/nvd/cve-2026-65182                   │
+│                                                             ├─────────────────┤          │        │                   │                             ├──────────────────────────────────────────────────────────────┤
+│                                                             │ CVE-2026-65905  │          │        │                   │                             │ tomcat: Apache Tomcat: Authentication bypass via limited     │
+│                                                             │                 │          │        │                   │                             │ replay attack in DIGEST authenticator...                     │
+│                                                             │                 │          │        │                   │                             │ https://avd.aquasec.com/nvd/cve-2026-65905                   │
+│                                                             ├─────────────────┤          │        │                   │                             ├──────────────────────────────────────────────────────────────┤
+│                                                             │ CVE-2026-68525  │          │        │                   │                             │ tomcat: Apache Tomcat: Unauthorized resource access via FORM │
+│                                                             │                 │          │        │                   │                             │ authentication bypass                                        │
+│                                                             │                 │          │        │                   │                             │ https://avd.aquasec.com/nvd/cve-2026-68525                   │
+│                                                             ├─────────────────┼──────────┤        │                   ├─────────────────────────────┼──────────────────────────────────────────────────────────────┤
+│                                                             │ CVE-2024-34750  │ HIGH     │        │                   │ 11.0.0-M21, 10.1.25, 9.0.90 │ tomcat: Improper Handling of Exceptional Conditions          │
+│                                                             │                 │          │        │                   │                             │ https://avd.aquasec.com/nvd/cve-2024-34750                   │
+│                                                             ├─────────────────┤          │        │                   │                             ├──────────────────────────────────────────────────────────────┤
+│                                                             │ CVE-2024-38286  │          │        │                   │                             │ tomcat: Denial of Service in Tomcat                          │
+│                                                             │                 │          │        │                   │                             │ https://avd.aquasec.com/nvd/cve-2024-38286                   │
+│                                                             ├─────────────────┤          │        │                   ├─────────────────────────────┼──────────────────────────────────────────────────────────────┤
+│                                                             │ CVE-2024-50379  │          │        │                   │ 11.0.2, 10.1.34, 9.0.98     │ tomcat: RCE due to TOCTOU issue in JSP compilation           │
+│                                                             │                 │          │        │                   │                             │ https://avd.aquasec.com/nvd/cve-2024-50379                   │
+│                                                             ├─────────────────┤          │        │                   │                             ├──────────────────────────────────────────────────────────────┤
+│                                                             │ CVE-2024-56337  │          │        │                   │                             │ tomcat: Incomplete fix for CVE-2024-50379 - RCE due to       │
+│                                                             │                 │          │        │                   │                             │ TOCTOU issue in...                                           │
+│                                                             │                 │          │        │                   │                             │ https://avd.aquasec.com/nvd/cve-2024-56337                   │
+│                                                             ├─────────────────┤          │        │                   ├─────────────────────────────┼──────────────────────────────────────────────────────────────┤
+│                                                             │ CVE-2025-48988  │          │        │                   │ 11.0.8, 10.1.42, 9.0.106    │ tomcat: Apache Tomcat DoS in multipart upload                │
+│                                                             │                 │          │        │                   │                             │ https://avd.aquasec.com/nvd/cve-2025-48988                   │
+│                                                             ├─────────────────┤          │        │                   ├─────────────────────────────┼──────────────────────────────────────────────────────────────┤
+│                                                             │ CVE-2025-48989  │          │        │                   │ 11.0.10, 10.1.44, 9.0.108   │ tomcat: http/2 "MadeYouReset" DoS attack through HTTP/2      │
+│                                                             │                 │          │        │                   │                             │ control frames                                               │
+│                                                             │                 │          │        │                   │                             │ https://avd.aquasec.com/nvd/cve-2025-48989                   │
+│                                                             ├─────────────────┤          │        │                   ├─────────────────────────────┼──────────────────────────────────────────────────────────────┤
+│                                                             │ CVE-2025-52520  │          │        │                   │ 11.0.9, 10.1.43, 9.0.107    │ tomcat: Apache Tomcat denial of service                      │
+│                                                             │                 │          │        │                   │                             │ https://avd.aquasec.com/nvd/cve-2025-52520                   │
+│                                                             ├─────────────────┤          │        │                   ├─────────────────────────────┼──────────────────────────────────────────────────────────────┤
+│                                                             │ CVE-2025-53506  │          │        │                   │ 9.0.107, 10.1.43, 11.0.9    │ tomcat: Apache Tomcat denial of service                      │
+│                                                             │                 │          │        │                   │                             │ https://avd.aquasec.com/nvd/cve-2025-53506                   │
+│                                                             ├─────────────────┤          │        │                   ├─────────────────────────────┼──────────────────────────────────────────────────────────────┤
+│                                                             │ CVE-2025-55752  │          │        │                   │ 11.0.11, 10.1.45, 9.0.109   │ tomcat: org.apache.tomcat/tomcat-catalina: Apache Tomcat:    │
+│                                                             │                 │          │        │                   │                             │ Directory traversal via rewrite with possible RCE            │
+│                                                             │                 │          │        │                   │                             │ https://avd.aquasec.com/nvd/cve-2025-55752                   │
+│                                                             ├─────────────────┤          │        │                   ├─────────────────────────────┼──────────────────────────────────────────────────────────────┤
+│                                                             │ CVE-2026-24734  │          │        │                   │ 11.0.18, 10.1.52, 9.0.115   │ tomcat: Apache Tomcat: Certificate revocation bypass due to  │
+│                                                             │                 │          │        │                   │                             │ improper OCSP response validation...                         │
+│                                                             │                 │          │        │                   │                             │ https://avd.aquasec.com/nvd/cve-2026-24734                   │
+│                                                             ├─────────────────┤          │        │                   ├─────────────────────────────┼──────────────────────────────────────────────────────────────┤
+│                                                             │ CVE-2026-24880  │          │        │                   │ 9.0.116, 10.1.52, 11.0.20   │ Apache Tomcat: Apache Tomcat: HTTP Request/Response          │
+│                                                             │                 │          │        │                   │                             │ Smuggling via invalid chunk extension                        │
+│                                                             │                 │          │        │                   │                             │ https://avd.aquasec.com/nvd/cve-2026-24880                   │
+│                                                             ├─────────────────┤          │        │                   ├─────────────────────────────┼──────────────────────────────────────────────────────────────┤
+│                                                             │ CVE-2026-34483  │          │        │                   │ 9.0.116, 10.1.54, 11.0.21   │ Apache Tomcat: Apache Tomcat: Information disclosure due to  │
+│                                                             │                 │          │        │                   │                             │ improper encoding in JsonAccessLogValve...                   │
+│                                                             │                 │          │        │                   │                             │ https://avd.aquasec.com/nvd/cve-2026-34483                   │
+│                                                             ├─────────────────┤          │        │                   ├─────────────────────────────┼──────────────────────────────────────────────────────────────┤
+│                                                             │ CVE-2026-34487  │          │        │                   │ 9.0.117, 10.1.54, 11.0.21   │ Apache Tomcat: Apache Tomcat: Information disclosure via     │
+│                                                             │                 │          │        │                   │                             │ sensitive data in log files...                               │
+│                                                             │                 │          │        │                   │                             │ https://avd.aquasec.com/nvd/cve-2026-34487                   │
+│                                                             ├─────────────────┤          │        │                   ├─────────────────────────────┼──────────────────────────────────────────────────────────────┤
+│                                                             │ CVE-2026-41284  │          │        │                   │ 9.0.118, 10.1.55, 11.0.22   │ tomcat: Apache Tomcat: Denial of Service due to uncontrolled │
+│                                                             │                 │          │        │                   │                             │ resource allocation                                          │
+│                                                             │                 │          │        │                   │                             │ https://avd.aquasec.com/nvd/cve-2026-41284                   │
+│                                                             ├─────────────────┤          │        │                   │                             ├──────────────────────────────────────────────────────────────┤
+│                                                             │ CVE-2026-42498  │          │        │                   │                             │ tomcat-coyote: Apache Tomcat: Information disclosure due to  │
+│                                                             │                 │          │        │                   │                             │ HTTP Authentication Header exposure during...                │
+│                                                             │                 │          │        │                   │                             │ https://avd.aquasec.com/nvd/cve-2026-42498                   │
+│                                                             ├─────────────────┤          │        │                   │                             ├──────────────────────────────────────────────────────────────┤
+│                                                             │ CVE-2026-43513  │          │        │                   │                             │ tomcat-catalina: Apache Tomcat: Improper Handling of Case    │
+│                                                             │                 │          │        │                   │                             │ Sensitivity in LockOutRealm                                  │
+│                                                             │                 │          │        │                   │                             │ https://avd.aquasec.com/nvd/cve-2026-43513                   │
+│                                                             ├─────────────────┤          │        │                   ├─────────────────────────────┼──────────────────────────────────────────────────────────────┤
+│                                                             │ CVE-2026-53404  │          │        │                   │ 11.0.23, 10.1.56, 9.0.119   │ Apache Tomcat: Apache Tomcat: Incorrect control flow in      │
+│                                                             │                 │          │        │                   │                             │ rewrite valve allows unexpected...                           │
+│                                                             │                 │          │        │                   │                             │ https://avd.aquasec.com/nvd/cve-2026-53404                   │
+│                                                             ├─────────────────┤          │        │                   ├─────────────────────────────┼──────────────────────────────────────────────────────────────┤
+│                                                             │ CVE-2026-55957  │          │        │                   │ 11.0.5, 10.1.37, 9.0.101    │ tomcat: Apache Tomcat: Authentication bypass via missing     │
+│                                                             │                 │          │        │                   │                             │ critical step in JNDIRealm GSSAPI...                         │
+│                                                             │                 │          │        │                   │                             │ https://avd.aquasec.com/nvd/cve-2026-55957                   │
+├─────────────────────────────────────────────────────────────┼─────────────────┤          │        ├───────────────────┼─────────────────────────────┼──────────────────────────────────────────────────────────────┤
+│ org.springframework.boot:spring-boot                        │ CVE-2025-22235  │          │        │ 3.2.0             │ 3.3.11, 3.4.5               │ org.springframework.boot/spring-boot: Spring Boot            │
+│ (demo-0.0.1-SNAPSHOT.jar)                                   │                 │          │        │                   │                             │ EndpointRequest.to() creates wrong matcher if actuator       │
+│                                                             │                 │          │        │                   │                             │ endpoint is not...                                           │
+│                                                             │                 │          │        │                   │                             │ https://avd.aquasec.com/nvd/cve-2025-22235                   │
+├─────────────────────────────────────────────────────────────┼─────────────────┤          │        ├───────────────────┼─────────────────────────────┼──────────────────────────────────────────────────────────────┤
+│ org.springframework:spring-core (demo-0.0.1-SNAPSHOT.jar)   │ CVE-2025-41249  │          │        │ 6.1.1             │ 6.2.11                      │ org.springframework/spring-core: Spring Framework Annotation │
+│                                                             │                 │          │        │                   │                             │ Detection Vulnerability                                      │
+│                                                             │                 │          │        │                   │                             │ https://avd.aquasec.com/nvd/cve-2025-41249                   │
+├─────────────────────────────────────────────────────────────┼─────────────────┤          │        │                   ├─────────────────────────────┼──────────────────────────────────────────────────────────────┤
+│ org.springframework:spring-expression                       │ CVE-2026-41850  │          │        │                   │ 7.0.8, 6.2.19               │ spring-framework: Spring Framework: Denial of Service via    │
+│ (demo-0.0.1-SNAPSHOT.jar)                                   │                 │          │        │                   │                             │ specially crafted SpEL expressions                           │
+│                                                             │                 │          │        │                   │                             │ https://avd.aquasec.com/nvd/cve-2026-41850                   │
+├─────────────────────────────────────────────────────────────┼─────────────────┤          │        │                   ├─────────────────────────────┼──────────────────────────────────────────────────────────────┤
+│ org.springframework:spring-web (demo-0.0.1-SNAPSHOT.jar)    │ CVE-2024-22243  │          │        │                   │ 6.1.4, 6.0.17, 5.3.32       │ springframework: URL Parsing with Host Validation            │
+│                                                             │                 │          │        │                   │                             │ https://avd.aquasec.com/nvd/cve-2024-22243                   │
+│                                                             ├─────────────────┤          │        │                   ├─────────────────────────────┼──────────────────────────────────────────────────────────────┤
+│                                                             │ CVE-2024-22259  │          │        │                   │ 6.1.5, 6.0.18, 5.3.33       │ springframework: URL Parsing with Host Validation            │
+│                                                             │                 │          │        │                   │                             │ https://avd.aquasec.com/nvd/cve-2024-22259                   │
+│                                                             ├─────────────────┤          │        │                   ├─────────────────────────────┼──────────────────────────────────────────────────────────────┤
+│                                                             │ CVE-2024-22262  │          │        │                   │ 5.3.34, 6.0.19, 6.1.6       │ springframework: URL Parsing with Host Validation            │
+│                                                             │                 │          │        │                   │                             │ https://avd.aquasec.com/nvd/cve-2024-22262                   │
+├─────────────────────────────────────────────────────────────┼─────────────────┼──────────┤        │                   ├─────────────────────────────┼──────────────────────────────────────────────────────────────┤
+│ org.springframework:spring-webmvc (demo-0.0.1-SNAPSHOT.jar) │ CVE-2026-47884  │ CRITICAL │        │                   │ 7.0.9                       │ org.springframework/spring-webmvc: Spring Framework: Remote  │
+│                                                             │                 │          │        │                   │                             │ Code Execution via improper path limitation in XsltView...   │
+│                                                             │                 │          │        │                   │                             │ https://avd.aquasec.com/nvd/cve-2026-47884                   │
+│                                                             ├─────────────────┼──────────┤        │                   ├─────────────────────────────┼──────────────────────────────────────────────────────────────┤
+│                                                             │ CVE-2024-38816  │ HIGH     │        │                   │ 6.1.13                      │ spring-webmvc: Path Traversal Vulnerability in Spring        │
+│                                                             │                 │          │        │                   │                             │ Applications Using RouterFunctions and FileSystemResource    │
+│                                                             │                 │          │        │                   │                             │ https://avd.aquasec.com/nvd/cve-2024-38816                   │
+│                                                             ├─────────────────┤          │        │                   ├─────────────────────────────┼──────────────────────────────────────────────────────────────┤
+│                                                             │ CVE-2024-38819  │          │        │                   │ 6.1.14                      │ org.springframework:spring-webmvc: Path traversal            │
+│                                                             │                 │          │        │                   │                             │ vulnerability in functional web frameworks                   │
+│                                                             │                 │          │        │                   │                             │ https://avd.aquasec.com/nvd/cve-2024-38819                   │
+│                                                             ├─────────────────┤          │        │                   ├─────────────────────────────┼──────────────────────────────────────────────────────────────┤
+│                                                             │ CVE-2026-41842  │          │        │                   │ 7.0.8, 6.2.19               │ spring-framework: Spring Framework: Denial of Service when   │
+│                                                             │                 │          │        │                   │                             │ resolving static resources                                   │
+│                                                             │                 │          │        │                   │                             │ https://avd.aquasec.com/nvd/cve-2026-41842                   │
+│                                                             ├─────────────────┤          │        │                   │                             ├──────────────────────────────────────────────────────────────┤
+│                                                             │ CVE-2026-41845  │          │        │                   │                             │ org.springframework: Spring Framework: Cross-site scripting  │
+│                                                             │                 │          │        │                   │                             │ (XSS) via incorrect JavaScript escaping                      │
+│                                                             │                 │          │        │                   │                             │ https://avd.aquasec.com/nvd/cve-2026-41845                   │
+└─────────────────────────────────────────────────────────────┴─────────────────┴──────────┴────────┴───────────────────┴─────────────────────────────┴──────────────────────────────────────────────────────────────┘
+[Pipeline] script
+[Pipeline] {
+[Pipeline] }
+[Pipeline] // script
+[Pipeline] }
+[Pipeline] // stage
+[Pipeline] stage
+[Pipeline] { (Push Image to DockerHub)
+[Pipeline] withCredentials
+Masking supported pattern matches of $DH_PASS
+[Pipeline] {
+[Pipeline] sh
++ echo ****
++ docker login -u adawy123 --password-stdin
+
+WARNING! Your credentials are stored unencrypted in '/root/.docker/config.json'.
+Configure a credential helper to remove this warning. See
+https://docs.docker.com/go/credential-store/
+
+Login Succeeded
+[Pipeline] retry
+[Pipeline] {
+[Pipeline] sh
++ docker push adawy123/demoapp:3
+The push refers to repository [docker.io/adawy123/demoapp]
+4d32ccc770f0: Waiting
+7a48b8f0e5c7: Waiting
+bc23f1b1cbf4: Waiting
+36a85beb042d: Waiting
+4d32ccc770f0: Waiting
+7a48b8f0e5c7: Waiting
+bc23f1b1cbf4: Waiting
+36a85beb042d: Waiting
+36a85beb042d: Waiting
+4d32ccc770f0: Waiting
+7a48b8f0e5c7: Waiting
+bc23f1b1cbf4: Waiting
+7a48b8f0e5c7: Waiting
+bc23f1b1cbf4: Waiting
+36a85beb042d: Waiting
+4d32ccc770f0: Waiting
+4d32ccc770f0: Waiting
+7a48b8f0e5c7: Waiting
+bc23f1b1cbf4: Waiting
+36a85beb042d: Waiting
+36a85beb042d: Waiting
+4d32ccc770f0: Waiting
+7a48b8f0e5c7: Waiting
+bc23f1b1cbf4: Waiting
+bc23f1b1cbf4: Waiting
+36a85beb042d: Waiting
+4d32ccc770f0: Waiting
+7a48b8f0e5c7: Waiting
+4d32ccc770f0: Waiting
+7a48b8f0e5c7: Waiting
+bc23f1b1cbf4: Waiting
+36a85beb042d: Waiting
+4d32ccc770f0: Waiting
+7a48b8f0e5c7: Waiting
+bc23f1b1cbf4: Waiting
+36a85beb042d: Waiting
+4d32ccc770f0: Waiting
+7a48b8f0e5c7: Waiting
+bc23f1b1cbf4: Waiting
+36a85beb042d: Waiting
+36a85beb042d: Waiting
+4d32ccc770f0: Waiting
+7a48b8f0e5c7: Waiting
+bc23f1b1cbf4: Waiting
+4d32ccc770f0: Waiting
+7a48b8f0e5c7: Waiting
+bc23f1b1cbf4: Waiting
+36a85beb042d: Waiting
+4d32ccc770f0: Waiting
+7a48b8f0e5c7: Waiting
+bc23f1b1cbf4: Waiting
+36a85beb042d: Waiting
+4d32ccc770f0: Waiting
+7a48b8f0e5c7: Waiting
+bc23f1b1cbf4: Waiting
+36a85beb042d: Waiting
+4d32ccc770f0: Waiting
+7a48b8f0e5c7: Waiting
+bc23f1b1cbf4: Waiting
+36a85beb042d: Waiting
+4d32ccc770f0: Waiting
+7a48b8f0e5c7: Waiting
+bc23f1b1cbf4: Waiting
+36a85beb042d: Waiting
+4d32ccc770f0: Waiting
+7a48b8f0e5c7: Waiting
+bc23f1b1cbf4: Waiting
+36a85beb042d: Waiting
+4d32ccc770f0: Waiting
+7a48b8f0e5c7: Waiting
+bc23f1b1cbf4: Waiting
+36a85beb042d: Waiting
+4d32ccc770f0: Waiting
+7a48b8f0e5c7: Waiting
+bc23f1b1cbf4: Waiting
+36a85beb042d: Waiting
+4d32ccc770f0: Waiting
+7a48b8f0e5c7: Waiting
+bc23f1b1cbf4: Waiting
+36a85beb042d: Waiting
+4d32ccc770f0: Waiting
+7a48b8f0e5c7: Waiting
+bc23f1b1cbf4: Waiting
+36a85beb042d: Waiting
+bfe809eb327d: Waiting
+4d32ccc770f0: Mounted from library/maven
+7a48b8f0e5c7: Mounted from library/maven
+bc23f1b1cbf4: Mounted from library/maven
+36a85beb042d: Waiting
+a53167f84a41: Waiting
+c3da2d783f35: Waiting
+36a85beb042d: Mounted from library/maven
+a53167f84a41: Waiting
+c3da2d783f35: Waiting
+bfe809eb327d: Waiting
+a53167f84a41: Waiting
+c3da2d783f35: Waiting
+bfe809eb327d: Waiting
+a7f6d3f54f3c: Waiting
+a53167f84a41: Waiting
+c3da2d783f35: Waiting
+bfe809eb327d: Waiting
+a7f6d3f54f3c: Waiting
+a7f6d3f54f3c: Waiting
+a53167f84a41: Waiting
+c3da2d783f35: Waiting
+bfe809eb327d: Waiting
+a53167f84a41: Mounted from library/maven
+c3da2d783f35: Mounted from library/maven
+bfe809eb327d: Waiting
+a7f6d3f54f3c: Waiting
+a7f6d3f54f3c: Waiting
+bfe809eb327d: Pushed
+a7f6d3f54f3c: Pushed
+3: digest: sha256:cc01cabc5aea5d922bfb6f164085a91fb29de8a8d2c720a198f47726086e8e27 size: 2056
+[Pipeline] }
+[Pipeline] // retry
+[Pipeline] }
+[Pipeline] // withCredentials
+[Pipeline] }
+[Pipeline] // stage
+[Pipeline] stage
+[Pipeline] { (Delete Image Locally)
+[Pipeline] sh
++ docker rmi adawy123/demoapp:3
+Untagged: adawy123/demoapp:3
+Deleted: sha256:cc01cabc5aea5d922bfb6f164085a91fb29de8a8d2c720a198f47726086e8e27
+Deleted: sha256:3f2355009084c34b0de6cffa4326be7d58f860927c7644acbd628f295f1964c1
+Deleted: sha256:cb7f3656f09809bfbf5810c02d1dbef6ebff246d1c4e803392c5a0267bbad6f6
+Deleted: sha256:ca4757266d6c6940ee60e98ebc97d9ef9f36691c9f6373439195deee665116be
+[Pipeline] }
+[Pipeline] // stage
+[Pipeline] stage
+[Pipeline] { (Update Image in Deployment File)
+[Pipeline] sh
++ sed -i s|image: adawy123/demoapp:.*|image: adawy123/demoapp:3| jenkins/Lab21/manifests/deployment.yaml
+[Pipeline] sh
++ grep -n image: jenkins/Lab21/manifests/deployment.yaml
+27:          image: adawy123/demoapp:3
+[Pipeline] }
+[Pipeline] // stage
+[Pipeline] stage
+[Pipeline] { (Deploy to Kubernetes)
+[Pipeline] withCredentials
+Masking supported pattern matches of $KUBECONFIG
+[Pipeline] {
+[Pipeline] sh
++ kubectl apply -f jenkins/Lab21/manifests/deployment.yaml
+deployment.apps/demoapp created
++ kubectl rollout status deployment/demoapp -n ivolve --timeout=180s
+Waiting for deployment "demoapp" rollout to finish: 0 out of 2 new replicas have been updated...
+Waiting for deployment "demoapp" rollout to finish: 0 of 2 updated replicas are available...
+error: timed out waiting for the condition
+[Pipeline] }
+[Pipeline] // withCredentials
+[Pipeline] }
+[Pipeline] // stage
+[Pipeline] stage
+[Pipeline] { (Declarative: Post Actions)
+[Pipeline] echo
+Pipeline #3 finished with status: FAILURE
+[Pipeline] sh
++ docker logout
+Removing login credentials for https://index.docker.io/v1/
+[Pipeline] archiveArtifacts
+Archiving artifacts
+[Pipeline] echo
+FAILURE: check the stage that failed in the console output
+[Pipeline] sh
++ docker rmi -f adawy123/demoapp:3
+Error response from daemon: No such image: adawy123/demoapp:3
+[Pipeline] deleteDir
+[Pipeline] }
+[Pipeline] // stage
+[Pipeline] }
+[Pipeline] // timeout
+[Pipeline] }
+[Pipeline] // withEnv
+[Pipeline] }
+[Pipeline] // withEnv
+[Pipeline] }
+[Pipeline] // node
+[Pipeline] End of Pipeline
+ERROR: script returned exit code 1
+Finished: FAILURE
