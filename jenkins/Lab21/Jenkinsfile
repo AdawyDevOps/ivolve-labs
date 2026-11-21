@@ -2,7 +2,7 @@ pipeline {
     agent any
 
     options {
-        timeout(time: 30, unit: 'MINUTES')
+        timeout(time: 45, unit: 'MINUTES')
         disableConcurrentBuilds()
     }
 
@@ -30,6 +30,20 @@ pipeline {
             }
         }
 
+        stage('Prepare Trivy DB') {
+            steps {
+                retry(2) {
+                    timeout(time: 20, unit: 'MINUTES') {
+                        sh '''#!/bin/bash
+set -eo pipefail
+trivy image --timeout 20m --no-progress --download-db-only
+trivy image --timeout 20m --no-progress --download-java-db-only
+'''
+                    }
+                }
+            }
+        }
+
         stage('Build App') {
             steps {
                 dir('app') {
@@ -51,7 +65,7 @@ pipeline {
             steps {
                 sh '''#!/bin/bash
 set -eo pipefail
-trivy image --timeout 30m --no-progress --scanners vuln --severity HIGH,CRITICAL --exit-code ${TRIVY_EXIT_CODE} ${FULL_IMAGE} | tee trivy-report.txt
+trivy image --timeout 10m --no-progress --skip-db-update --skip-java-db-update --scanners vuln --severity HIGH,CRITICAL --exit-code ${TRIVY_EXIT_CODE} ${FULL_IMAGE} | tee trivy-report.txt
 '''
                 script {
                     if (params.FORCE_FAILURE) {
@@ -67,7 +81,9 @@ trivy image --timeout 30m --no-progress --scanners vuln --severity HIGH,CRITICAL
                                                   usernameVariable: 'DH_USER',
                                                   passwordVariable: 'DH_PASS')]) {
                     sh 'echo "$DH_PASS" | docker login -u "$DH_USER" --password-stdin'
-                    sh 'docker push ${FULL_IMAGE}'
+                    retry(2) {
+                        sh 'docker push ${FULL_IMAGE}'
+                    }
                 }
             }
         }
