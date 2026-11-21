@@ -127,6 +127,10 @@ trivy image --timeout 10m --no-progress --skip-db-update --skip-java-db-update -
             echo 'FAILURE: check the stage that failed in the console output'
             sh 'docker rmi -f ${FULL_IMAGE} || true'
         }
+        aborted {
+            echo 'ABORTED: the build was interrupted'
+            sh 'docker rmi -f ${FULL_IMAGE} || true'
+        }
         cleanup {
             deleteDir()
         }
