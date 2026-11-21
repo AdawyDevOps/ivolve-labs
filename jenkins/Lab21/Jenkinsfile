@@ -17,6 +17,7 @@ pipeline {
         K8S_NAMESPACE   = 'ivolve'
         MANIFEST        = 'jenkins/Lab21/manifests/deployment.yaml'
         TRIVY_EXIT_CODE = '0'
+        TRIVY_CACHE_DIR = '/var/jenkins_home/trivy-cache'
     }
 
     stages {
@@ -50,7 +51,7 @@ pipeline {
             steps {
                 sh '''#!/bin/bash
 set -eo pipefail
-trivy image --no-progress --scanners vuln --severity HIGH,CRITICAL --exit-code ${TRIVY_EXIT_CODE} ${FULL_IMAGE} | tee trivy-report.txt
+trivy image --timeout 30m --no-progress --scanners vuln --severity HIGH,CRITICAL --exit-code ${TRIVY_EXIT_CODE} ${FULL_IMAGE} | tee trivy-report.txt
 '''
                 script {
                     if (params.FORCE_FAILURE) {
