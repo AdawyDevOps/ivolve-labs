@@ -106,7 +106,7 @@ trivy image --timeout 10m --no-progress --skip-db-update --skip-java-db-update -
                 withCredentials([file(credentialsId: 'kubeconfig-jenkinssa', variable: 'KUBECONFIG')]) {
                     sh '''
                         kubectl apply -f ${MANIFEST}
-                        kubectl rollout status deployment/demoapp -n ${K8S_NAMESPACE} --timeout=180s
+                        kubectl rollout status deployment/demoapp -n ${K8S_NAMESPACE} --timeout=600s
                         kubectl get pods -n ${K8S_NAMESPACE} -l app=demoapp -o wide
                     '''
                 }
